@@ -86,11 +86,13 @@ async def _detect_dark_vessels():
             if existing:
                 continue
 
-            hours_since = v["hours_since"]
+            hours_since = float(v["hours_since"])
+            sog = float(v["sog"] or 0)
+            cog = float(v["cog"] or 0)
             pred_lat, pred_lon = dead_reckon(
-                v["lat"], v["lon"], v["sog"], v["cog"], hours_since
+                v["lat"], v["lon"], sog, cog, hours_since
             )
-            search_radius = (v["sog"] or 1) * hours_since * 0.5
+            search_radius = (sog or 1) * hours_since * 0.5
 
             await conn.execute(
                 """
@@ -102,9 +104,9 @@ async def _detect_dark_vessels():
                         $6, $7, $8, $9, $10)
                 """,
                 v["mmsi"],
-                v["lon"], v["lat"],
+                float(v["lon"]), float(v["lat"]),
                 pred_lon, pred_lat,
-                v["sog"], v["cog"],
+                sog, cog,
                 hours_since,
                 search_radius,
                 v["timestamp"],

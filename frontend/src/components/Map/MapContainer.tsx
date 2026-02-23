@@ -3,6 +3,8 @@ import Map, { MapRef } from 'react-map-gl/maplibre'
 import { MapViewState } from '@deck.gl/core'
 import DeckGL from '@deck.gl/react'
 import { ScatterplotLayer, PathLayer } from '@deck.gl/layers'
+import { DataFilterExtension } from '@deck.gl/extensions'
+import type { DataFilterExtensionProps } from '@deck.gl/extensions'
 import type { PickingInfo } from '@deck.gl/core'
 import 'maplibre-gl/dist/maplibre-gl.css'
 
@@ -32,23 +34,24 @@ export default function MapContainer() {
   const [viewState, setViewState] = useState<MapViewState>(INITIAL_VIEW)
   const mapRef = useRef<MapRef>(null)
 
-  const vesselArray = useMemo(() => {
-    const all = Array.from(vessels.values())
-    if (!searchQuery) return all
+  const vesselArray = useMemo(() => Array.from(vessels.values()), [vessels])
+
+  const searchMatchSet = useMemo(() => {
+    if (!searchQuery) return null
     const q = searchQuery.toLowerCase()
-    const filtered = all.filter(
-      (v) =>
-        String(v.mmsi).includes(q) ||
-        (v.name && v.name.toLowerCase().includes(q)),
-    )
-    return filtered
-  }, [vessels, searchQuery])
+    const matches = new Set<number>()
+    for (const v of vesselArray) {
+      if (String(v.mmsi).includes(q) || (v.name && v.name.toLowerCase().includes(q)))
+        matches.add(v.mmsi)
+    }
+    return matches
+  }, [vesselArray, searchQuery])
 
   // Sync filtered count back to store for TopBar display
   const setFilteredCount = useVesselStore((s) => s.setFilteredCount)
   useEffect(() => {
-    setFilteredCount(vesselArray.length)
-  }, [vesselArray.length, setFilteredCount])
+    setFilteredCount(searchMatchSet ? searchMatchSet.size : vesselArray.length)
+  }, [searchMatchSet, vesselArray.length, setFilteredCount])
 
   const handleClick = useCallback(
     async (info: PickingInfo) => {
@@ -89,9 +92,11 @@ export default function MapContainer() {
 
   // --- Split layer memos ---
 
+  const dataFilter = useMemo(() => new DataFilterExtension({ filterSize: 1 }), [])
+
   const vesselLayer = useMemo(() => {
     if (!vesselLayerVisible || vesselArray.length === 0) return null
-    return new ScatterplotLayer<Vessel>({
+    return new ScatterplotLayer<Vessel, DataFilterExtensionProps<Vessel>>({
       id: 'vessels',
       data: vesselArray,
       getPosition: (d) => [d.lon, d.lat],
@@ -101,11 +106,15 @@ export default function MapContainer() {
       radiusMaxPixels: 12,
       pickable: true,
       radiusUnits: 'pixels',
+      extensions: [dataFilter],
+      getFilterValue: (d) => searchMatchSet ? (searchMatchSet.has(d.mmsi) ? 1 : 0) : 1,
+      filterRange: [1, 1],
       updateTriggers: {
         getRadius: selectedMmsi,
+        getFilterValue: searchMatchSet,
       },
     })
-  }, [vesselArray, selectedMmsi, vesselLayerVisible])
+  }, [vesselArray, selectedMmsi, vesselLayerVisible, searchMatchSet, dataFilter])
 
   const trackLayer = useMemo(() => {
     if (selectedTrack.length <= 1) return null

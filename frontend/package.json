@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@deck.gl/core": "^9.1.4",
+    "@deck.gl/extensions": "^9.1.4",
     "@deck.gl/layers": "^9.1.4",
     "@deck.gl/react": "^9.1.4",
     "@luma.gl/core": "^9.1.0",
