@@ -25,6 +25,24 @@ class Settings(BaseSettings):
     dark_vessel_gap_hours: float = 2.0
     dark_vessel_active_window_hours: float = 24.0
 
+    # Copernicus / Sentinel-1
+    copernicus_client_id: str = ""
+    copernicus_client_secret: str = ""
+    copernicus_username: str = ""
+    copernicus_password: str = ""
+
+    # NASA Earthdata (VIIRS / FIRMS)
+    earthdata_username: str = ""
+    earthdata_token: str = ""
+
+    # SAR processing
+    sar_scene_cache_dir: str = "/app/sar_data"
+    sar_cfar_guard_pixels: int = 4
+    sar_cfar_bg_pixels: int = 16
+    sar_cfar_pfa: float = 1e-3
+    sar_match_radius_m: float = 5000.0
+    sar_match_time_window_s: float = 3600.0
+
     @property
     def database_url(self) -> str:
         return (

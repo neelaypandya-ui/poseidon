@@ -9,6 +9,8 @@ from app.database import init_db, close_db, init_redis, close_redis
 from app.ingestors.ais_stream import run_ais_stream
 from app.ingestors.redis_buffer import run_buffer_flush
 from app.processors.dark_vessel import run_dark_vessel_detector
+from app.processors.sar_cfar import run_sar_matcher
+from app.processors.viirs_anomaly import run_viirs_fetcher
 from app.api.router import api_router
 from app.api.ws import ws_router
 
@@ -30,6 +32,8 @@ async def lifespan(app: FastAPI):
         asyncio.create_task(run_ais_stream(), name="ais_stream"),
         asyncio.create_task(run_buffer_flush(), name="buffer_flush"),
         asyncio.create_task(run_dark_vessel_detector(), name="dark_vessel"),
+        asyncio.create_task(run_sar_matcher(), name="sar_matcher"),
+        asyncio.create_task(run_viirs_fetcher(), name="viirs_fetcher"),
     ]
 
     yield

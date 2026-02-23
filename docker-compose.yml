@@ -43,6 +43,8 @@ services:
         condition: service_healthy
     volumes:
       - ./backend/app:/app/app
+      - ./data/sar_scenes:/app/sar_data
+      - ./data/reports:/app/reports
 
   frontend:
     build: ./frontend

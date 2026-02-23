@@ -2,13 +2,13 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Map, { MapRef } from 'react-map-gl/maplibre'
 import { MapViewState } from '@deck.gl/core'
 import DeckGL from '@deck.gl/react'
-import { ScatterplotLayer, PathLayer } from '@deck.gl/layers'
+import { ScatterplotLayer, PathLayer, GeoJsonLayer } from '@deck.gl/layers'
 import { DataFilterExtension } from '@deck.gl/extensions'
 import type { DataFilterExtensionProps } from '@deck.gl/extensions'
 import type { PickingInfo } from '@deck.gl/core'
 import 'maplibre-gl/dist/maplibre-gl.css'
 
-import { useVesselStore, type Vessel } from '../../stores/vesselStore'
+import { useVesselStore, type Vessel, type SarDetection, type ViirsAnomaly } from '../../stores/vesselStore'
 import { getVesselColor } from '../../utils/colors'
 import { fetchVesselTrack } from '../../hooks/useVessels'
 
@@ -29,8 +29,19 @@ export default function MapContainer() {
   const selectedTrack = useVesselStore((s) => s.selectedTrack)
   const setSelectedTrack = useVesselStore((s) => s.setSelectedTrack)
   const darkAlerts = useVesselStore((s) => s.darkAlerts)
+  const darkAlertLayerVisible = useVesselStore((s) => s.darkAlertLayerVisible)
   const vesselLayerVisible = useVesselStore((s) => s.vesselLayerVisible)
   const searchQuery = useVesselStore((s) => s.searchQuery)
+  const criticalRiskMmsis = useVesselStore((s) => s.criticalRiskMmsis)
+  const lowConfidenceMmsis = useVesselStore((s) => s.lowConfidenceMmsis)
+  const riskFusionFilter = useVesselStore((s) => s.riskFusionFilter)
+  const sarDetections = useVesselStore((s) => s.sarDetections)
+  const sarLayerVisible = useVesselStore((s) => s.sarLayerVisible)
+  const ghostVesselLayerVisible = useVesselStore((s) => s.ghostVesselLayerVisible)
+  const viirsAnomalies = useVesselStore((s) => s.viirsAnomalies)
+  const viirsLayerVisible = useVesselStore((s) => s.viirsLayerVisible)
+  const routePrediction = useVesselStore((s) => s.routePrediction)
+  const routeLayerVisible = useVesselStore((s) => s.routeLayerVisible)
   const [viewState, setViewState] = useState<MapViewState>(INITIAL_VIEW)
   const mapRef = useRef<MapRef>(null)
 
@@ -82,13 +93,16 @@ export default function MapContainer() {
     [],
   )
 
-  // Pulsing effect for dark vessel alerts
+  // Pulsing effect for dark vessel alerts + ghost vessels + VIIRS + critical highlights
   const [pulsePhase, setPulsePhase] = useState(0)
+  const hasGhosts = sarDetections.some((d) => !d.matched)
+  const hasViirs = viirsAnomalies.length > 0 && viirsLayerVisible
+  const hasCritical = criticalRiskMmsis.size > 0
   useEffect(() => {
-    if (darkAlerts.length === 0) return
+    if (darkAlerts.length === 0 && !hasGhosts && !hasViirs && !hasCritical) return
     const id = setInterval(() => setPulsePhase((p) => (p + 1) % 60), 50)
     return () => clearInterval(id)
-  }, [darkAlerts.length])
+  }, [darkAlerts.length, hasGhosts, hasViirs, hasCritical])
 
   // --- Split layer memos ---
 
@@ -107,14 +121,19 @@ export default function MapContainer() {
       pickable: true,
       radiusUnits: 'pixels',
       extensions: [dataFilter],
-      getFilterValue: (d) => searchMatchSet ? (searchMatchSet.has(d.mmsi) ? 1 : 0) : 1,
+      getFilterValue: (d) => {
+        if (searchMatchSet && !searchMatchSet.has(d.mmsi)) return 0
+        if (riskFusionFilter === 'critical' && !criticalRiskMmsis.has(d.mmsi)) return 0
+        if (riskFusionFilter === 'low_confidence' && !lowConfidenceMmsis.has(d.mmsi)) return 0
+        return 1
+      },
       filterRange: [1, 1],
       updateTriggers: {
         getRadius: selectedMmsi,
-        getFilterValue: searchMatchSet,
+        getFilterValue: [searchMatchSet, riskFusionFilter, criticalRiskMmsis, lowConfidenceMmsis],
       },
     })
-  }, [vesselArray, selectedMmsi, vesselLayerVisible, searchMatchSet, dataFilter])
+  }, [vesselArray, selectedMmsi, vesselLayerVisible, searchMatchSet, dataFilter, riskFusionFilter, criticalRiskMmsis, lowConfidenceMmsis])
 
   const trackLayer = useMemo(() => {
     if (selectedTrack.length <= 1) return null
@@ -136,7 +155,7 @@ export default function MapContainer() {
   }, [selectedTrack])
 
   const darkAlertsLayer = useMemo(() => {
-    if (darkAlerts.length === 0) return null
+    if (!darkAlertLayerVisible || darkAlerts.length === 0) return null
     const pulseRadius = 8 + Math.sin((pulsePhase / 60) * Math.PI * 2) * 4
     return new ScatterplotLayer({
       id: 'dark-alerts',
@@ -158,11 +177,138 @@ export default function MapContainer() {
         getRadius: pulsePhase,
       },
     })
-  }, [darkAlerts, pulsePhase])
+  }, [darkAlerts, darkAlertLayerVisible, pulsePhase])
+
+  const matchedDetections = useMemo(
+    () => sarDetections.filter((d) => d.matched),
+    [sarDetections],
+  )
+
+  const unmatchedDetections = useMemo(
+    () => sarDetections.filter((d) => !d.matched),
+    [sarDetections],
+  )
+
+  const sarDetectionLayer = useMemo(() => {
+    if (!sarLayerVisible || matchedDetections.length === 0) return null
+    return new ScatterplotLayer<SarDetection>({
+      id: 'sar-detections',
+      data: matchedDetections,
+      getPosition: (d) => [d.lon, d.lat],
+      getFillColor: [255, 200, 0, 180],
+      getRadius: 6,
+      radiusMinPixels: 4,
+      radiusUnits: 'pixels',
+      pickable: true,
+    })
+  }, [matchedDetections, sarLayerVisible])
+
+  const ghostVesselLayer = useMemo(() => {
+    if (!ghostVesselLayerVisible || unmatchedDetections.length === 0) return null
+    const pulseRadius = 8 + Math.sin((pulsePhase / 60) * Math.PI * 2) * 4
+    return new ScatterplotLayer<SarDetection>({
+      id: 'ghost-vessels',
+      data: unmatchedDetections,
+      getPosition: (d) => [d.lon, d.lat],
+      getFillColor: [255, 0, 60, 200],
+      getLineColor: [255, 60, 60, 255],
+      getRadius: pulseRadius,
+      radiusMinPixels: pulseRadius,
+      stroked: true,
+      lineWidthMinPixels: 2,
+      radiusUnits: 'pixels',
+      pickable: true,
+      updateTriggers: {
+        getRadius: pulsePhase,
+      },
+    })
+  }, [unmatchedDetections, ghostVesselLayerVisible, pulsePhase])
+
+  const viirsLayer = useMemo(() => {
+    if (!viirsLayerVisible || viirsAnomalies.length === 0) return null
+    const pulseRadius = 6 + Math.sin((pulsePhase / 60) * Math.PI * 2) * 3
+    return new ScatterplotLayer<ViirsAnomaly>({
+      id: 'viirs-anomalies',
+      data: viirsAnomalies,
+      getPosition: (d) => [d.lon, d.lat],
+      getFillColor: [255, 160, 0, 180],
+      getLineColor: [255, 200, 50, 255],
+      getRadius: pulseRadius,
+      radiusMinPixels: pulseRadius,
+      stroked: true,
+      lineWidthMinPixels: 1,
+      radiusUnits: 'pixels',
+      pickable: true,
+      updateTriggers: {
+        getRadius: pulsePhase,
+      },
+    })
+  }, [viirsAnomalies, viirsLayerVisible, pulsePhase])
+
+  const routePredictionLayer = useMemo(() => {
+    if (!routeLayerVisible || !routePrediction || routePrediction.route_geom.length < 2) return null
+    return new PathLayer({
+      id: 'route-prediction',
+      data: [{ path: routePrediction.route_geom }],
+      getPath: (d: any) => d.path,
+      getColor: [0, 255, 136, 200],
+      getWidth: 2,
+      widthMinPixels: 2,
+      widthMaxPixels: 4,
+      getDashArray: [6, 4],
+      dashJustified: true,
+      jointRounded: true,
+      capRounded: true,
+    })
+  }, [routePrediction, routeLayerVisible])
+
+  const confidenceConeLayer = useMemo(() => {
+    if (!routeLayerVisible || !routePrediction) return null
+    const features = [routePrediction.confidence_90, routePrediction.confidence_70].filter(Boolean)
+    if (features.length === 0) return null
+    return new GeoJsonLayer({
+      id: 'confidence-cones',
+      data: { type: 'FeatureCollection', features },
+      getFillColor: (f: any) =>
+        f.properties?.confidence >= 0.9 ? [0, 255, 136, 30] : [0, 255, 136, 60],
+      getLineColor: [0, 255, 136, 100],
+      lineWidthMinPixels: 1,
+      stroked: true,
+      filled: true,
+    })
+  }, [routePrediction, routeLayerVisible])
+
+  const criticalVessels = useMemo(
+    () => vesselArray.filter((v) => criticalRiskMmsis.has(v.mmsi)),
+    [vesselArray, criticalRiskMmsis],
+  )
+
+  const criticalHighlightLayer = useMemo(() => {
+    if (criticalVessels.length === 0) return null
+    const pulseRadius = 12 + Math.sin((pulsePhase / 60) * Math.PI * 2) * 4
+    return new ScatterplotLayer<Vessel>({
+      id: 'critical-highlights',
+      data: criticalVessels,
+      getPosition: (d) => [d.lon, d.lat],
+      getFillColor: [255, 0, 0, 0],
+      getLineColor: [255, 40, 40, 220],
+      getRadius: pulseRadius,
+      radiusMinPixels: pulseRadius,
+      radiusMaxPixels: 24,
+      stroked: true,
+      filled: false,
+      lineWidthMinPixels: 2,
+      radiusUnits: 'pixels',
+      pickable: false,
+      updateTriggers: {
+        getRadius: pulsePhase,
+      },
+    })
+  }, [criticalVessels, pulsePhase])
 
   const layers = useMemo(
-    () => [vesselLayer, trackLayer, darkAlertsLayer].filter(Boolean),
-    [vesselLayer, trackLayer, darkAlertsLayer],
+    () => [confidenceConeLayer, vesselLayer, criticalHighlightLayer, trackLayer, routePredictionLayer, darkAlertsLayer, sarDetectionLayer, ghostVesselLayer, viirsLayer].filter(Boolean),
+    [confidenceConeLayer, vesselLayer, criticalHighlightLayer, trackLayer, routePredictionLayer, darkAlertsLayer, sarDetectionLayer, ghostVesselLayer, viirsLayer],
   )
 
   return (
@@ -180,6 +326,7 @@ export default function MapContainer() {
           ref={mapRef}
           mapStyle={CARTO_DARK}
           reuseMaps
+          attributionControl={false}
         />
       </DeckGL>
     </div>
