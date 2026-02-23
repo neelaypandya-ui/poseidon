@@ -9,6 +9,8 @@ Real-time global vessel tracking and dark vessel detection powered by AIS data, 
 ![Stack](https://img.shields.io/badge/Redis-DC382D?style=flat&logo=redis&logoColor=white)
 ![Stack](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white)
 
+![Poseidon Screenshot](docs/screenshot.png)
+
 ## Overview
 
 Poseidon ingests live AIS (Automatic Identification System) data from [aisstream.io](https://aisstream.io), processes it through a high-throughput pipeline, and renders 20,000+ vessel positions on an interactive dark-themed map. It detects "dark vessels" — ships that stop transmitting AIS — using gap analysis and dead reckoning.
