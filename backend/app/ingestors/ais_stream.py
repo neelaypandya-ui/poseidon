@@ -126,6 +126,9 @@ async def _connect_and_consume():
             if parsed is None:
                 continue
 
+            # Attach raw message for forensic storage
+            parsed["raw_json"] = msg
+
             encoded = json.dumps(parsed)
 
             # Dual Redis path: durable buffer + instant pub/sub

@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useVesselStore } from '../../stores/vesselStore'
 import { createReplayJob, getReplayData, type ReplayData } from '../../hooks/useReplay'
+import { exportCanvasVideo, downloadBlob, type ResolutionPreset, getResolution } from '../../utils/videoExport'
 
-export default function ReplayPanel() {
-  const [isOpen, setIsOpen] = useState(false)
+export default function ReplayPanel({ isOpen }: { isOpen: boolean }) {
   const [startTime, setStartTime] = useState('')
   const [endTime, setEndTime] = useState('')
   const [mmsiStr, setMmsiStr] = useState('')
@@ -11,6 +11,11 @@ export default function ReplayPanel() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [replayData, setReplayData] = useState<ReplayData | null>(null)
+
+  // Video export state
+  const [exporting, setExporting] = useState(false)
+  const [exportProgress, setExportProgress] = useState(0)
+  const [exportResolution, setExportResolution] = useState<ResolutionPreset>('1080p')
 
   const replayPlaying = useVesselStore((s) => s.replayPlaying)
   const setReplayPlaying = useVesselStore((s) => s.setReplayPlaying)
@@ -90,21 +95,47 @@ export default function ReplayPanel() {
     applyFrame(index)
   }
 
+  const handleExportVideo = async () => {
+    const canvas = document.querySelector('canvas') as HTMLCanvasElement | null
+    if (!canvas) {
+      setError('Canvas not found for video export')
+      return
+    }
+
+    setExporting(true)
+    setExportProgress(0)
+
+    try {
+      const res = getResolution(exportResolution)
+      const duration = replayData ? replayData.frames.length / speed : 30
+      const blob = await exportCanvasVideo(
+        canvas,
+        {
+          width: res.width,
+          height: res.height,
+          fps: 30,
+          duration: Math.min(duration, 300), // Cap at 5 minutes
+          filename: `poseidon_replay_${exportResolution}.webm`,
+        },
+        setExportProgress,
+      )
+      downloadBlob(blob, `poseidon_replay_${exportResolution}.webm`)
+    } catch (e: any) {
+      setError(`Export failed: ${e.message}`)
+    } finally {
+      setExporting(false)
+      setExportProgress(0)
+    }
+  }
+
   const currentTimestamp = replayData && replayFrameIndex < replayData.frames.length
     ? replayData.frames[replayFrameIndex].timestamp
     : null
 
-  return (
-    <div className="absolute bottom-4 left-80 z-20">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="bg-navy-800/95 backdrop-blur border border-navy-600 rounded-lg px-3 py-2 text-sm font-medium text-purple-400 hover:bg-navy-700/95 transition-colors"
-      >
-        Replay {isOpen ? '\u25B2' : '\u25BC'}
-      </button>
+  if (!isOpen) return null
 
-      {isOpen && (
-        <div className="mt-1 w-96 bg-navy-800/95 backdrop-blur border border-navy-600 rounded-lg overflow-hidden">
+  return (
+        <div className="w-96 bg-navy-800/95 backdrop-blur border border-navy-600 rounded-lg overflow-hidden">
           <div className="px-3 py-2 bg-purple-900/20 border-b border-navy-600">
             <h3 className="text-purple-400 font-semibold text-sm">Historical Replay</h3>
           </div>
@@ -154,7 +185,7 @@ export default function ReplayPanel() {
                     onClick={() => handleSeek(0)}
                     className="text-sm bg-navy-600 hover:bg-navy-500 text-white px-2 py-1 rounded transition-colors"
                   >
-                    \u23EE
+                    {'\u23EE'}
                   </button>
                 </div>
                 <span className="text-xs text-gray-400">
@@ -176,10 +207,38 @@ export default function ReplayPanel() {
                   {new Date(currentTimestamp).toLocaleString()}
                 </div>
               )}
+
+              {/* Video Export Section */}
+              <div className="border-t border-navy-700 pt-2 space-y-1.5">
+                <div className="flex items-center gap-2">
+                  <select
+                    value={exportResolution}
+                    onChange={(e) => setExportResolution(e.target.value as ResolutionPreset)}
+                    className="bg-navy-700 border border-navy-600 rounded px-2 py-1 text-xs text-white focus:outline-none focus:border-cyan-500"
+                  >
+                    <option value="1080p">1080p</option>
+                    <option value="1440p">1440p</option>
+                    <option value="4K">4K</option>
+                  </select>
+                  <button
+                    onClick={handleExportVideo}
+                    disabled={exporting}
+                    className="flex-1 text-xs bg-cyan-600 hover:bg-cyan-500 disabled:bg-cyan-800 text-white py-1.5 rounded transition-colors"
+                  >
+                    {exporting ? `Exporting... ${exportProgress.toFixed(0)}%` : 'Export Video'}
+                  </button>
+                </div>
+                {exporting && (
+                  <div className="w-full bg-navy-700 rounded-full h-1.5">
+                    <div
+                      className="bg-cyan-500 h-1.5 rounded-full transition-all"
+                      style={{ width: `${exportProgress}%` }}
+                    />
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>
-      )}
-    </div>
   )
 }

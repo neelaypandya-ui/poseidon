@@ -1,0 +1,1293 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "CNSHA",
+        "name": "Shanghai",
+        "country_code": "CN",
+        "country_name": "China",
+        "port_size": "large"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [121.4737, 31.2304]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "SGSIN",
+        "name": "Singapore",
+        "country_code": "SG",
+        "country_name": "Singapore",
+        "port_size": "large"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [103.8474, 1.2646]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "CNNGB",
+        "name": "Ningbo-Zhoushan",
+        "country_code": "CN",
+        "country_name": "China",
+        "port_size": "large"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [121.9500, 29.8683]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "CNSZN",
+        "name": "Shenzhen",
+        "country_code": "CN",
+        "country_name": "China",
+        "port_size": "large"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [113.9413, 22.4764]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "CNQIN",
+        "name": "Qingdao",
+        "country_code": "CN",
+        "country_name": "China",
+        "port_size": "large"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [120.3826, 36.0671]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "KRPUS",
+        "name": "Busan",
+        "country_code": "KR",
+        "country_name": "South Korea",
+        "port_size": "large"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [129.0756, 35.1796]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "CNTJN",
+        "name": "Tianjin",
+        "country_code": "CN",
+        "country_name": "China",
+        "port_size": "large"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [117.7467, 38.9860]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "HKHKG",
+        "name": "Hong Kong",
+        "country_code": "HK",
+        "country_name": "Hong Kong",
+        "port_size": "large"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [114.1694, 22.2864]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "CNCAN",
+        "name": "Guangzhou",
+        "country_code": "CN",
+        "country_name": "China",
+        "port_size": "large"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [113.2644, 23.1291]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "AEJEA",
+        "name": "Jebel Ali (Dubai)",
+        "country_code": "AE",
+        "country_name": "United Arab Emirates",
+        "port_size": "large"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [55.0272, 25.0174]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "NLRTM",
+        "name": "Rotterdam",
+        "country_code": "NL",
+        "country_name": "Netherlands",
+        "port_size": "large"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [4.4777, 51.9244]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "MYPTG",
+        "name": "Port Klang",
+        "country_code": "MY",
+        "country_name": "Malaysia",
+        "port_size": "large"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [101.3904, 3.0006]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "BEANR",
+        "name": "Antwerp",
+        "country_code": "BE",
+        "country_name": "Belgium",
+        "port_size": "large"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [4.4025, 51.2194]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "CNXMN",
+        "name": "Xiamen",
+        "country_code": "CN",
+        "country_name": "China",
+        "port_size": "large"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [118.0894, 24.4798]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "TWKHH",
+        "name": "Kaohsiung",
+        "country_code": "TW",
+        "country_name": "Taiwan",
+        "port_size": "large"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [120.2849, 22.6122]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "CNDAL",
+        "name": "Dalian",
+        "country_code": "CN",
+        "country_name": "China",
+        "port_size": "large"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [121.6147, 38.9140]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "MYTPP",
+        "name": "Tanjung Pelepas",
+        "country_code": "MY",
+        "country_name": "Malaysia",
+        "port_size": "large"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [103.5510, 1.3625]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "THLCH",
+        "name": "Laem Chabang",
+        "country_code": "TH",
+        "country_name": "Thailand",
+        "port_size": "large"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [100.8831, 13.0839]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "DEHAM",
+        "name": "Hamburg",
+        "country_code": "DE",
+        "country_name": "Germany",
+        "port_size": "large"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [9.9656, 53.5333]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "USLAX",
+        "name": "Los Angeles",
+        "country_code": "US",
+        "country_name": "United States",
+        "port_size": "large"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.2720, 33.7405]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "VNSGN",
+        "name": "Ho Chi Minh City",
+        "country_code": "VN",
+        "country_name": "Vietnam",
+        "port_size": "medium"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [106.7540, 10.7626]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "SAJED",
+        "name": "Jeddah",
+        "country_code": "SA",
+        "country_name": "Saudi Arabia",
+        "port_size": "medium"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [39.1728, 21.5169]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "USLGB",
+        "name": "Long Beach",
+        "country_code": "US",
+        "country_name": "United States",
+        "port_size": "medium"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.2137, 33.7544]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "LKCMB",
+        "name": "Colombo",
+        "country_code": "LK",
+        "country_name": "Sri Lanka",
+        "port_size": "medium"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [79.8554, 6.9418]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "INMUN",
+        "name": "Mundra",
+        "country_code": "IN",
+        "country_name": "India",
+        "port_size": "medium"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [69.7193, 22.7411]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "USNYC",
+        "name": "New York",
+        "country_code": "US",
+        "country_name": "United States",
+        "port_size": "medium"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-74.0060, 40.6840]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "GRPIR",
+        "name": "Piraeus",
+        "country_code": "GR",
+        "country_name": "Greece",
+        "port_size": "medium"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [23.6473, 37.9475]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "INBOM",
+        "name": "Mumbai (Nhava Sheva)",
+        "country_code": "IN",
+        "country_name": "India",
+        "port_size": "medium"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [72.9510, 18.9510]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "ESALG",
+        "name": "Algeciras",
+        "country_code": "ES",
+        "country_name": "Spain",
+        "port_size": "medium"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-5.4534, 36.1272]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "ESBCN",
+        "name": "Barcelona",
+        "country_code": "ES",
+        "country_name": "Spain",
+        "port_size": "medium"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.1590, 41.3497]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "BRSSZ",
+        "name": "Santos",
+        "country_code": "BR",
+        "country_name": "Brazil",
+        "port_size": "medium"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-46.3042, -23.9618]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "DEBRV",
+        "name": "Bremerhaven",
+        "country_code": "DE",
+        "country_name": "Germany",
+        "port_size": "medium"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [8.5762, 53.5396]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "PHMNL",
+        "name": "Manila",
+        "country_code": "PH",
+        "country_name": "Philippines",
+        "port_size": "medium"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [120.9667, 14.5176]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "JPTYO",
+        "name": "Tokyo",
+        "country_code": "JP",
+        "country_name": "Japan",
+        "port_size": "medium"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [139.7745, 35.6524]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "JPYOK",
+        "name": "Yokohama",
+        "country_code": "JP",
+        "country_name": "Japan",
+        "port_size": "medium"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [139.6500, 35.4437]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "MATNG",
+        "name": "Tangier Med",
+        "country_code": "MA",
+        "country_name": "Morocco",
+        "port_size": "medium"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-5.5050, 35.8853]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "PLGDN",
+        "name": "Gdansk",
+        "country_code": "PL",
+        "country_name": "Poland",
+        "port_size": "medium"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [18.6596, 54.3520]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "USHOU",
+        "name": "Houston",
+        "country_code": "US",
+        "country_name": "United States",
+        "port_size": "medium"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-95.2698, 29.7261]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "EGPSD",
+        "name": "Port Said",
+        "country_code": "EG",
+        "country_name": "Egypt",
+        "port_size": "medium"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.3019, 31.2653]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "OMSLL",
+        "name": "Salalah",
+        "country_code": "OM",
+        "country_name": "Oman",
+        "port_size": "medium"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [54.0268, 16.9306]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "SADMM",
+        "name": "Dammam (King Abdulaziz)",
+        "country_code": "SA",
+        "country_name": "Saudi Arabia",
+        "port_size": "medium"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [50.1933, 26.4547]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "IRBND",
+        "name": "Bandar Abbas",
+        "country_code": "IR",
+        "country_name": "Iran",
+        "port_size": "medium"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [56.2808, 27.1865]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "INMAA",
+        "name": "Chennai",
+        "country_code": "IN",
+        "country_name": "India",
+        "port_size": "medium"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [80.2947, 13.0827]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "BDCGP",
+        "name": "Chittagong",
+        "country_code": "BD",
+        "country_name": "Bangladesh",
+        "port_size": "medium"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [91.8207, 22.3264]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "FRLEH",
+        "name": "Le Havre",
+        "country_code": "FR",
+        "country_name": "France",
+        "port_size": "medium"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [0.1079, 49.4938]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "GBFXT",
+        "name": "Felixstowe",
+        "country_code": "GB",
+        "country_name": "United Kingdom",
+        "port_size": "medium"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [1.3511, 51.9559]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "ITGOA",
+        "name": "Genoa",
+        "country_code": "IT",
+        "country_name": "Italy",
+        "port_size": "medium"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [8.9264, 44.4056]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "GBSOU",
+        "name": "Southampton",
+        "country_code": "GB",
+        "country_name": "United Kingdom",
+        "port_size": "medium"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-1.4049, 50.8998]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "IDTJK",
+        "name": "Jakarta (Tanjung Priok)",
+        "country_code": "ID",
+        "country_name": "Indonesia",
+        "port_size": "medium"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [106.8764, -6.1010]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "CAVCR",
+        "name": "Vancouver",
+        "country_code": "CA",
+        "country_name": "Canada",
+        "port_size": "medium"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-123.1139, 49.2900]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "PACOL",
+        "name": "Colon",
+        "country_code": "PA",
+        "country_name": "Panama",
+        "port_size": "medium"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-79.8769, 9.3566]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "TRIST",
+        "name": "Istanbul (Ambarli)",
+        "country_code": "TR",
+        "country_name": "Turkey",
+        "port_size": "medium"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [28.6919, 40.9682]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "ZADUR",
+        "name": "Durban",
+        "country_code": "ZA",
+        "country_name": "South Africa",
+        "port_size": "medium"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [31.0292, -29.8687]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "FRMRS",
+        "name": "Marseille (Fos)",
+        "country_code": "FR",
+        "country_name": "France",
+        "port_size": "small"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [5.3698, 43.2965]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "JPUKB",
+        "name": "Kobe",
+        "country_code": "JP",
+        "country_name": "Japan",
+        "port_size": "small"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [135.1956, 34.6760]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "USMSY",
+        "name": "New Orleans",
+        "country_code": "US",
+        "country_name": "United States",
+        "port_size": "small"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-90.0586, 29.9411]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "USMIA",
+        "name": "Miami",
+        "country_code": "US",
+        "country_name": "United States",
+        "port_size": "small"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-80.1851, 25.7686]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "ARBUE",
+        "name": "Buenos Aires",
+        "country_code": "AR",
+        "country_name": "Argentina",
+        "port_size": "small"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-58.3510, -34.6037]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "NGLOS",
+        "name": "Lagos (Apapa/Tin Can)",
+        "country_code": "NG",
+        "country_name": "Nigeria",
+        "port_size": "small"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [3.3792, 6.4281]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "KEMBA",
+        "name": "Mombasa",
+        "country_code": "KE",
+        "country_name": "Kenya",
+        "port_size": "small"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [39.6583, -4.0435]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "DJJIB",
+        "name": "Djibouti",
+        "country_code": "DJ",
+        "country_name": "Djibouti",
+        "port_size": "small"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [43.1456, 11.5950]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "EGALY",
+        "name": "Alexandria",
+        "country_code": "EG",
+        "country_name": "Egypt",
+        "port_size": "small"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [29.8625, 31.1975]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "IDSUB",
+        "name": "Surabaya (Tanjung Perak)",
+        "country_code": "ID",
+        "country_name": "Indonesia",
+        "port_size": "small"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [112.7330, -7.2001]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "AUSYD",
+        "name": "Sydney",
+        "country_code": "AU",
+        "country_name": "Australia",
+        "port_size": "small"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [151.2290, -33.8482]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "AUMEL",
+        "name": "Melbourne",
+        "country_code": "AU",
+        "country_name": "Australia",
+        "port_size": "small"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [144.9127, -37.8226]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "NZAKL",
+        "name": "Auckland",
+        "country_code": "NZ",
+        "country_name": "New Zealand",
+        "port_size": "small"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [174.7633, -36.8420]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "USSVN",
+        "name": "Savannah",
+        "country_code": "US",
+        "country_name": "United States",
+        "port_size": "medium"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-81.0912, 32.0835]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "USSEA",
+        "name": "Seattle-Tacoma",
+        "country_code": "US",
+        "country_name": "United States",
+        "port_size": "small"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.3472, 47.5820]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "COBUN",
+        "name": "Buenaventura",
+        "country_code": "CO",
+        "country_name": "Colombia",
+        "port_size": "small"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-77.0420, 3.8801]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "CLSAI",
+        "name": "San Antonio",
+        "country_code": "CL",
+        "country_name": "Chile",
+        "port_size": "small"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-71.6175, -33.5939]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "PECLL",
+        "name": "Callao",
+        "country_code": "PE",
+        "country_name": "Peru",
+        "port_size": "small"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-77.1365, -12.0464]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "MXMAN",
+        "name": "Manzanillo",
+        "country_code": "MX",
+        "country_name": "Mexico",
+        "port_size": "small"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-104.3188, 19.0545]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "JMKIN",
+        "name": "Kingston",
+        "country_code": "JM",
+        "country_name": "Jamaica",
+        "port_size": "small"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-76.8504, 17.9547]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "ITGIT",
+        "name": "Gioia Tauro",
+        "country_code": "IT",
+        "country_name": "Italy",
+        "port_size": "small"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [15.8931, 38.4333]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "EGSKH",
+        "name": "Sokhna (Ain Sokhna)",
+        "country_code": "EG",
+        "country_name": "Egypt",
+        "port_size": "small"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.3373, 29.6089]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "PTLIS",
+        "name": "Lisbon (Sines)",
+        "country_code": "PT",
+        "country_name": "Portugal",
+        "port_size": "small"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-8.8700, 37.9503]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "SEGOT",
+        "name": "Gothenburg",
+        "country_code": "SE",
+        "country_name": "Sweden",
+        "port_size": "small"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [11.9407, 57.6948]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "RULED",
+        "name": "St. Petersburg",
+        "country_code": "RU",
+        "country_name": "Russia",
+        "port_size": "small"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [30.2250, 59.9000]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "ITVCE",
+        "name": "Venice",
+        "country_code": "IT",
+        "country_name": "Italy",
+        "port_size": "small"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [12.3456, 45.4408]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "MTMAR",
+        "name": "Marsaxlokk",
+        "country_code": "MT",
+        "country_name": "Malta",
+        "port_size": "small"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [14.5436, 35.8381]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "ROCON",
+        "name": "Constanta",
+        "country_code": "RO",
+        "country_name": "Romania",
+        "port_size": "small"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [28.6600, 44.1733]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "RUVVO",
+        "name": "Vladivostok",
+        "country_code": "RU",
+        "country_name": "Russia",
+        "port_size": "small"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [131.9036, 43.1056]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "MZMPM",
+        "name": "Maputo",
+        "country_code": "MZ",
+        "country_name": "Mozambique",
+        "port_size": "small"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.5713, -25.9653]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "TZDAR",
+        "name": "Dar es Salaam",
+        "country_code": "TZ",
+        "country_name": "Tanzania",
+        "port_size": "small"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [39.2750, -6.8235]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "SDPZU",
+        "name": "Port Sudan",
+        "country_code": "SD",
+        "country_name": "Sudan",
+        "port_size": "small"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [37.2164, 19.6158]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "GHTEM",
+        "name": "Tema",
+        "country_code": "GH",
+        "country_name": "Ghana",
+        "port_size": "small"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-0.0175, 5.6283]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "PKKAR",
+        "name": "Karachi",
+        "country_code": "PK",
+        "country_name": "Pakistan",
+        "port_size": "small"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [66.9850, 24.8465]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "MMRGN",
+        "name": "Yangon",
+        "country_code": "MM",
+        "country_name": "Myanmar",
+        "port_size": "small"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [96.1735, 16.8409]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "VNHPH",
+        "name": "Haiphong",
+        "country_code": "VN",
+        "country_name": "Vietnam",
+        "port_size": "small"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [106.6881, 20.8449]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "PGPOM",
+        "name": "Port Moresby",
+        "country_code": "PG",
+        "country_name": "Papua New Guinea",
+        "port_size": "small"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [147.1597, -9.4438]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "FJSUV",
+        "name": "Suva",
+        "country_code": "FJ",
+        "country_name": "Fiji",
+        "port_size": "small"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [178.4272, -18.1416]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "locode": "AUBNE",
+        "name": "Brisbane",
+        "country_code": "AU",
+        "country_name": "Australia",
+        "port_size": "small"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [153.1711, -27.3813]
+      }
+    }
+  ]
+}

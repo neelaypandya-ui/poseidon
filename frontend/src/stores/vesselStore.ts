@@ -74,6 +74,19 @@ export interface OpticalScene {
   file_path: string | null
 }
 
+export interface SpoofCluster {
+  id: number
+  signal_count: number
+  centroid_lon: number
+  centroid_lat: number
+  radius_nm: number | null
+  window_start: string
+  window_end: string
+  anomaly_types: string[]
+  status: string
+  created_at: string
+}
+
 export interface RoutePrediction {
   mmsi: number
   route_geom: [number, number][]
@@ -86,6 +99,8 @@ export interface RoutePrediction {
   ship_type: string | null
   sog_used: number
   cog_used: number
+  destination_name: string | null
+  destination_coords: [number, number] | null
 }
 
 export interface ViirsAnomaly {
@@ -99,6 +114,27 @@ export interface ViirsAnomaly {
   anomaly_type: string | null
   brightness_ratio: number | null
   detected_at: string
+}
+
+export interface ForensicPing {
+  id: number
+  lon: number
+  lat: number
+  flagged: boolean
+  timestamp: string
+}
+
+export interface AcousticEvent {
+  id: number
+  source: string
+  event_type: string
+  lon: number | null
+  lat: number | null
+  bearing: number | null
+  magnitude: number | null
+  event_time: string
+  correlated_mmsi: number | null
+  correlation_confidence: number | null
 }
 
 interface VesselState {
@@ -136,9 +172,47 @@ interface VesselState {
   lowConfidenceMmsis: Set<number>
   riskFusionFilter: 'all' | 'critical' | 'low_confidence'
 
+  // Spoof state
+  spoofClusters: SpoofCluster[]
+  spoofLayerVisible: boolean
+  spoofHeatmapVisible: boolean
+  spoofHeatmapData: { lon: number; lat: number; weight: number }[]
+
+  // Correlation state
+  correlationCount: number
+
+  // Maritime overlay state
+  shippingLaneLayerVisible: boolean
+
+  // AOI state
+  drawingAoi: boolean
+  aoiPolygonPoints: [number, number][]
+  aoiGeoJsons: any[]
+
   // Replay state
   replayPlaying: boolean
   replayFrameIndex: number
+
+  // EEZ layer state
+  eezLayerVisible: boolean
+  eezData: any | null
+
+  // Ports layer state
+  portsLayerVisible: boolean
+  portsData: any | null
+
+  // Bathymetry layer state
+  bathymetryLayerVisible: boolean
+
+  // Acoustic events state
+  acousticEvents: AcousticEvent[]
+  acousticLayerVisible: boolean
+
+  // Webcam markers state
+  webcamLayerVisible: boolean
+
+  // Forensic pings state
+  forensicPings: ForensicPing[]
 
   setVessels: (vessels: Vessel[]) => void
   updateVessel: (vessel: Vessel) => void
@@ -175,9 +249,47 @@ interface VesselState {
   setLowConfidenceMmsis: (mmsis: Set<number>) => void
   setRiskFusionFilter: (filter: 'all' | 'critical' | 'low_confidence') => void
 
+  // Spoof actions
+  setSpoofClusters: (clusters: SpoofCluster[]) => void
+  toggleSpoofLayer: () => void
+  toggleSpoofHeatmap: () => void
+  setSpoofHeatmapData: (data: { lon: number; lat: number; weight: number }[]) => void
+
+  // Correlation actions
+  setCorrelationCount: (count: number) => void
+
+  // Maritime overlay actions
+  toggleShippingLaneLayer: () => void
+
+  // AOI actions
+  setDrawingAoi: (drawing: boolean) => void
+  setAoiPolygonPoints: (points: [number, number][]) => void
+  setAoiGeoJsons: (geojsons: any[]) => void
+
   // Replay actions
   setReplayPlaying: (playing: boolean) => void
   setReplayFrameIndex: (index: number) => void
+
+  // EEZ actions
+  toggleEezLayer: () => void
+  setEezData: (data: any) => void
+
+  // Ports actions
+  togglePortsLayer: () => void
+  setPortsData: (data: any) => void
+
+  // Bathymetry actions
+  toggleBathymetryLayer: () => void
+
+  // Acoustic actions
+  setAcousticEvents: (events: AcousticEvent[]) => void
+  toggleAcousticLayer: () => void
+
+  // Webcam actions
+  toggleWebcamLayer: () => void
+
+  // Forensic pings actions
+  setForensicPings: (pings: ForensicPing[]) => void
 }
 
 export const useVesselStore = create<VesselState>((set) => ({
@@ -209,8 +321,37 @@ export const useVesselStore = create<VesselState>((set) => ({
   lowConfidenceMmsis: new Set(),
   riskFusionFilter: 'all',
 
+  spoofClusters: [],
+  spoofLayerVisible: true,
+  spoofHeatmapVisible: false,
+  spoofHeatmapData: [],
+
+  correlationCount: 0,
+
+  shippingLaneLayerVisible: false,
+
+  drawingAoi: false,
+  aoiPolygonPoints: [],
+  aoiGeoJsons: [],
+
   replayPlaying: false,
   replayFrameIndex: 0,
+
+  // New layer defaults
+  eezLayerVisible: false,
+  eezData: null,
+
+  portsLayerVisible: false,
+  portsData: null,
+
+  bathymetryLayerVisible: false,
+
+  acousticEvents: [],
+  acousticLayerVisible: false,
+
+  webcamLayerVisible: false,
+
+  forensicPings: [],
 
   setVessels: (vessels) =>
     set(() => {
@@ -262,6 +403,35 @@ export const useVesselStore = create<VesselState>((set) => ({
   setLowConfidenceMmsis: (mmsis) => set({ lowConfidenceMmsis: mmsis }),
   setRiskFusionFilter: (filter) => set({ riskFusionFilter: filter }),
 
+  setSpoofClusters: (clusters) => set({ spoofClusters: clusters }),
+  toggleSpoofLayer: () => set((s) => ({ spoofLayerVisible: !s.spoofLayerVisible })),
+  toggleSpoofHeatmap: () => set((s) => ({ spoofHeatmapVisible: !s.spoofHeatmapVisible })),
+  setSpoofHeatmapData: (data) => set({ spoofHeatmapData: data }),
+
+  setCorrelationCount: (count) => set({ correlationCount: count }),
+
+  toggleShippingLaneLayer: () => set((s) => ({ shippingLaneLayerVisible: !s.shippingLaneLayerVisible })),
+
+  setDrawingAoi: (drawing) => set({ drawingAoi: drawing }),
+  setAoiPolygonPoints: (points) => set({ aoiPolygonPoints: points }),
+  setAoiGeoJsons: (geojsons) => set({ aoiGeoJsons: geojsons }),
+
   setReplayPlaying: (playing) => set({ replayPlaying: playing }),
   setReplayFrameIndex: (index) => set({ replayFrameIndex: index }),
+
+  // New layer actions
+  toggleEezLayer: () => set((s) => ({ eezLayerVisible: !s.eezLayerVisible })),
+  setEezData: (data) => set({ eezData: data }),
+
+  togglePortsLayer: () => set((s) => ({ portsLayerVisible: !s.portsLayerVisible })),
+  setPortsData: (data) => set({ portsData: data }),
+
+  toggleBathymetryLayer: () => set((s) => ({ bathymetryLayerVisible: !s.bathymetryLayerVisible })),
+
+  setAcousticEvents: (events) => set({ acousticEvents: events }),
+  toggleAcousticLayer: () => set((s) => ({ acousticLayerVisible: !s.acousticLayerVisible })),
+
+  toggleWebcamLayer: () => set((s) => ({ webcamLayerVisible: !s.webcamLayerVisible })),
+
+  setForensicPings: (pings) => set({ forensicPings: pings }),
 }))

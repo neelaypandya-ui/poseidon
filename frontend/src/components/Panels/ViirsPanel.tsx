@@ -2,9 +2,8 @@ import { useState } from 'react'
 import { useVesselStore } from '../../stores/vesselStore'
 import { fetchViirs, fetchViirsAnomalies } from '../../hooks/useViirs'
 
-export default function ViirsPanel() {
+export default function ViirsPanel({ isOpen }: { isOpen: boolean }) {
   const viirsAnomalies = useVesselStore((s) => s.viirsAnomalies)
-  const [isOpen, setIsOpen] = useState(false)
   const [bboxStr, setBboxStr] = useState('')
   const [days, setDays] = useState(1)
   const [fetching, setFetching] = useState(false)
@@ -42,17 +41,10 @@ export default function ViirsPanel() {
     }
   }
 
-  return (
-    <div className="absolute top-40 right-4 z-20">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="bg-navy-800/95 backdrop-blur border border-navy-600 rounded-lg px-3 py-2 text-sm font-medium text-orange-400 hover:bg-navy-700/95 transition-colors"
-      >
-        VIIRS {isOpen ? '\u25B2' : '\u25BC'}
-      </button>
+  if (!isOpen) return null
 
-      {isOpen && (
-        <div className="mt-1 w-80 bg-navy-800/95 backdrop-blur border border-navy-600 rounded-lg overflow-hidden">
+  return (
+        <div className="w-80 bg-navy-800/95 backdrop-blur border border-navy-600 rounded-lg overflow-hidden">
           <div className="px-3 py-2 bg-orange-900/20 border-b border-navy-600">
             <h3 className="text-orange-400 font-semibold text-sm">VIIRS Nighttime Lights</h3>
           </div>
@@ -118,7 +110,5 @@ export default function ViirsPanel() {
             </button>
           </div>
         </div>
-      )}
-    </div>
   )
 }

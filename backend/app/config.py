@@ -35,6 +35,21 @@ class Settings(BaseSettings):
     earthdata_username: str = ""
     earthdata_token: str = ""
 
+    # Equasis
+    equasis_email: str = ""
+    equasis_password: str = ""
+
+    # OpenSanctions
+    opensanctions_api_key: str = ""
+
+    # AOI monitoring
+    aoi_check_interval: int = 60
+
+    # Spoof detection
+    spoof_scan_interval: int = 120
+    spoof_impossible_speed_knots: float = 50.0
+    spoof_cluster_window_minutes: int = 5
+
     # SAR processing
     sar_scene_cache_dir: str = "/app/sar_data"
     sar_cfar_guard_pixels: int = 4
@@ -42,6 +57,24 @@ class Settings(BaseSettings):
     sar_cfar_pfa: float = 1e-3
     sar_match_radius_m: float = 5000.0
     sar_match_time_window_s: float = 3600.0
+
+    # JWT Authentication
+    auth_enabled: bool = False
+    jwt_secret_key: str = "poseidon-secret-change-in-production"
+    jwt_expire_minutes: int = 480  # 8 hours
+
+    # CMEMS Ocean Currents
+    cmems_username: str = ""
+    cmems_password: str = ""
+
+    # EEZ monitoring
+    eez_check_interval: int = 120  # seconds
+
+    # Acoustic events
+    acoustic_fetch_interval: int = 600  # seconds
+
+    # Scheduled reports
+    report_check_interval: int = 300  # seconds
 
     @property
     def database_url(self) -> str:

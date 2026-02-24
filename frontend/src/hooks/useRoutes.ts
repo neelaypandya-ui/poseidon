@@ -15,6 +15,8 @@ export interface RoutePrediction {
   ship_type: string | null
   sog_used: number
   cog_used: number
+  destination_name: string | null
+  destination_coords: [number, number] | null
 }
 
 export async function predictRoute(mmsi: number, hours = 24): Promise<RoutePrediction> {

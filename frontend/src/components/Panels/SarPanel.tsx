@@ -2,9 +2,8 @@ import { useState } from 'react'
 import { useVesselStore } from '../../stores/vesselStore'
 import { searchSarScenes, processSarScene, fetchSarDetections } from '../../hooks/useSar'
 
-export default function SarPanel() {
+export default function SarPanel({ isOpen }: { isOpen: boolean }) {
   const sarScenes = useVesselStore((s) => s.sarScenes)
-  const [isOpen, setIsOpen] = useState(false)
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
   const [bboxStr, setBboxStr] = useState('')
@@ -64,17 +63,10 @@ export default function SarPanel() {
     }
   }
 
-  return (
-    <div className="absolute top-16 right-4 z-20">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="bg-navy-800/95 backdrop-blur border border-navy-600 rounded-lg px-3 py-2 text-sm font-medium text-amber-400 hover:bg-navy-700/95 transition-colors"
-      >
-        SAR {isOpen ? '\u25B2' : '\u25BC'}
-      </button>
+  if (!isOpen) return null
 
-      {isOpen && (
-        <div className="mt-1 w-80 bg-navy-800/95 backdrop-blur border border-navy-600 rounded-lg overflow-hidden">
+  return (
+        <div className="w-80 bg-navy-800/95 backdrop-blur border border-navy-600 rounded-lg overflow-hidden">
           <div className="px-3 py-2 bg-amber-900/20 border-b border-navy-600">
             <h3 className="text-amber-400 font-semibold text-sm">
               Sentinel-1 SAR Search
@@ -170,7 +162,5 @@ export default function SarPanel() {
             </button>
           </div>
         </div>
-      )}
-    </div>
   )
 }

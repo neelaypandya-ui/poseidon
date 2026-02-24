@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@deck.gl/aggregation-layers": "^9.2.9",
     "@deck.gl/core": "^9.1.4",
     "@deck.gl/extensions": "^9.1.4",
     "@deck.gl/layers": "^9.1.4",

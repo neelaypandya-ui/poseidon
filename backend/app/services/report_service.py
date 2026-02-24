@@ -2,9 +2,11 @@
 PDF report generation service for vessel intelligence reports.
 
 Uses fpdf2 to generate structured PDF reports containing vessel identity,
-risk assessment, track summary, dark activity, and SAR detections.
+risk assessment, track summary, dark activity, SAR detections,
+sanctions screening, Equasis registry, and forensic assessment.
 """
 
+import json
 import os
 import math
 import logging
@@ -13,6 +15,9 @@ from datetime import datetime, timezone
 from fpdf import FPDF
 
 from app.database import get_db
+from app.services.assessment_service import compute_assessment
+from app.services.sanctions_service import screen_vessel
+from app.services.equasis_service import lookup_vessel
 
 logger = logging.getLogger("poseidon.report_service")
 
@@ -175,7 +180,24 @@ async def generate_vessel_report(mmsi: int) -> str:
         mmsi,
     )
 
-    # 5. Get SAR detections if any
+    # 5. Get forensic assessment, sanctions, equasis
+    assessment = await compute_assessment(mmsi)
+    sanctions = await screen_vessel(
+        mmsi=mmsi,
+        imo=vessel.get("imo"),
+        name=vessel.get("name"),
+    )
+    equasis_data = None
+    if vessel.get("imo"):
+        equasis_data = await lookup_vessel(vessel["imo"])
+
+    spoof_signals = await db.fetch(
+        """SELECT anomaly_type::text, ST_X(geom) AS lon, ST_Y(geom) AS lat, detected_at
+           FROM spoof_signals WHERE mmsi = $1 ORDER BY detected_at DESC LIMIT 10""",
+        mmsi,
+    )
+
+    # 6. Get SAR detections if any
     sar_detections = []
     try:
         sar_detections = await db.fetch(
@@ -384,12 +406,92 @@ async def generate_vessel_report(mmsi: int) -> str:
         pdf.set_font("Helvetica", "", 10)
         pdf.cell(0, 6, "No SAR detections matched to this vessel.", new_x="LMARGIN", new_y="NEXT")
 
+    # --- Forensic Assessment Section ---
+    if assessment:
+        pdf.section_header("FORENSIC ASSESSMENT")
+        sev = assessment.get("severity", "unknown").upper()
+        score = assessment.get("severity_score", 0)
+        pdf.set_font("Helvetica", "B", 12)
+        if score >= 50:
+            pdf.set_text_color(220, 38, 38)
+        elif score >= 30:
+            pdf.set_text_color(245, 158, 11)
+        elif score > 0:
+            pdf.set_text_color(234, 179, 8)
+        else:
+            pdf.set_text_color(34, 197, 94)
+        pdf.cell(0, 8, f"Severity: {sev} ({score}/100)", new_x="LMARGIN", new_y="NEXT")
+        pdf.set_text_color(0, 0, 0)
+        pdf.set_font("Helvetica", "", 9)
+        pdf.multi_cell(0, 5, assessment.get("verdict", ""))
+        pdf.ln(2)
+
+        for i, f in enumerate(assessment.get("findings", []), 1):
+            pdf.set_font("Helvetica", "B", 9)
+            pdf.cell(0, 5, f"  {i}. [{f['severity'].upper()}] {f['title']}", new_x="LMARGIN", new_y="NEXT")
+            pdf.set_font("Helvetica", "", 8)
+            pdf.multi_cell(0, 4, f"     {f['detail']}")
+            pdf.ln(1)
+
+    # --- Sanctions Screening Section ---
+    pdf.section_header("SANCTIONS SCREENING")
+    if sanctions and sanctions.get("sanctioned") and sanctions.get("match_count", 0) > 0:
+        real_matches = [m for m in sanctions.get("matches", []) if m.get("entity_id") != "__none__"]
+        if real_matches:
+            pdf.set_font("Helvetica", "B", 11)
+            pdf.set_text_color(220, 38, 38)
+            pdf.cell(0, 7, f"** SANCTIONS HIT — {len(real_matches)} match(es) **", new_x="LMARGIN", new_y="NEXT")
+            pdf.set_text_color(0, 0, 0)
+            pdf.set_font("Helvetica", "", 9)
+            for m in real_matches:
+                datasets = ", ".join(m.get("datasets", []))
+                pdf.multi_cell(0, 5, f"  Entity: {m.get('entity_name', 'N/A')} | Score: {m.get('score', 0):.0%} | Datasets: {datasets}")
+                pdf.ln(1)
+        else:
+            pdf.set_font("Helvetica", "", 10)
+            pdf.set_text_color(34, 197, 94)
+            pdf.cell(0, 6, "No sanctions matches found.", new_x="LMARGIN", new_y="NEXT")
+            pdf.set_text_color(0, 0, 0)
+    else:
+        pdf.set_font("Helvetica", "", 10)
+        pdf.set_text_color(34, 197, 94)
+        pdf.cell(0, 6, "No sanctions matches found.", new_x="LMARGIN", new_y="NEXT")
+        pdf.set_text_color(0, 0, 0)
+
+    # --- Equasis Registry Section ---
+    if equasis_data:
+        pdf.section_header("VESSEL REGISTRY (EQUASIS)")
+        pdf.key_value("Registered Owner", equasis_data.get("registered_owner") or "N/A")
+        pdf.key_value("Operator", equasis_data.get("operator") or "N/A")
+        pdf.key_value("Flag State", equasis_data.get("flag_state") or "N/A")
+        pdf.key_value("Class Society", equasis_data.get("class_society") or "N/A")
+        pdf.key_value("Gross Tonnage", str(equasis_data.get("gross_tonnage") or "N/A"))
+        pdf.key_value("Deadweight", str(equasis_data.get("deadweight") or "N/A"))
+        pdf.key_value("Year Built", str(equasis_data.get("year_built") or "N/A"))
+
+        if equasis_data.get("inspections"):
+            pdf.ln(2)
+            pdf.set_font("Helvetica", "B", 10)
+            pdf.cell(0, 6, "Port State Control Inspections:", new_x="LMARGIN", new_y="NEXT")
+            pdf.set_font("Helvetica", "", 8)
+            for insp in equasis_data["inspections"][:10]:
+                pdf.cell(0, 5, f"  {insp.get('date', 'N/A')} — Deficiencies: {insp.get('deficiencies', 0)}, Detentions: {insp.get('detentions', 0)}", new_x="LMARGIN", new_y="NEXT")
+
+    # --- Spoof Signals Section ---
+    if spoof_signals:
+        pdf.section_header("SPOOF SIGNALS")
+        pdf.set_font("Helvetica", "", 9)
+        pdf.key_value("Total Spoof Signals", str(len(spoof_signals)))
+        for ss in spoof_signals:
+            pdf.cell(0, 5, f"  {ss['anomaly_type']} at ({ss['lat']:.3f}, {ss['lon']:.3f}) — {ss['detected_at'].strftime('%Y-%m-%d %H:%M UTC')}", new_x="LMARGIN", new_y="NEXT")
+
     # --- Classification footer ---
     pdf.ln(10)
     pdf.set_font("Helvetica", "B", 8)
     pdf.set_text_color(128, 128, 128)
     pdf.cell(0, 5, "CLASSIFICATION: UNCLASSIFIED // FOR OFFICIAL USE ONLY", align="C", new_x="LMARGIN", new_y="NEXT")
     pdf.cell(0, 5, "This report is auto-generated by the Poseidon Maritime Intelligence Platform.", align="C", new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(0, 5, "Sources: AIS, Copernicus S-1/S-2, NASA VIIRS, OpenSanctions, Equasis.", align="C", new_x="LMARGIN", new_y="NEXT")
 
     # 7. Save PDF
     os.makedirs(REPORTS_DIR, exist_ok=True)
@@ -403,5 +505,20 @@ async def generate_vessel_report(mmsi: int) -> str:
         "Generated report for MMSI %d: %s (%d track points, %d alerts, %d SAR)",
         mmsi, filepath, num_positions, len(dark_list), len(sar_list),
     )
+
+    # Save report metadata to DB
+    try:
+        report_id = await db.fetchval(
+            """INSERT INTO incident_reports (mmsi, title, report_type, content, pdf_path)
+               VALUES ($1, $2, 'vessel', $3::jsonb, $4)
+               RETURNING id""",
+            mmsi,
+            f"Vessel Report — {vessel.get('name') or mmsi}",
+            json.dumps({"severity": assessment.get("severity") if assessment else None,
+                        "sanctioned": sanctions.get("sanctioned") if sanctions else None}),
+            filepath,
+        )
+    except Exception as e:
+        logger.warning("Failed to save report metadata: %s", e)
 
     return filepath

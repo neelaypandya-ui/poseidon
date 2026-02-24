@@ -11,6 +11,7 @@ from app.services.sar_service import (
     get_ghost_vessels,
 )
 from app.processors.sar_cfar import process_scene, match_detections_to_ais
+from app.processors.kelvin_wake import extract_kelvin_wakes, get_kelvin_wakes
 
 logger = logging.getLogger("poseidon.api.sar")
 
@@ -102,3 +103,27 @@ async def list_ghost_vessels(
         bbox = (min_lon, min_lat, max_lon, max_lat)
     ghosts = await get_ghost_vessels(bbox=bbox)
     return {"count": len(ghosts), "ghost_vessels": ghosts}
+
+
+@router.post("/scenes/{scene_db_id}/kelvin-wakes")
+async def extract_wakes(scene_db_id: int, background_tasks: BackgroundTasks):
+    """Extract Kelvin wake patterns from a processed SAR scene."""
+    background_tasks.add_task(extract_kelvin_wakes, scene_db_id)
+    return {"status": "processing", "scene_id": scene_db_id}
+
+
+@router.get("/kelvin-wakes")
+async def list_kelvin_wakes(
+    scene_id: int | None = Query(None),
+    min_lon: float | None = Query(None),
+    min_lat: float | None = Query(None),
+    max_lon: float | None = Query(None),
+    max_lat: float | None = Query(None),
+    limit: int = Query(200, ge=1, le=1000),
+):
+    """List Kelvin wake detections."""
+    bbox = None
+    if all(v is not None for v in [min_lon, min_lat, max_lon, max_lat]):
+        bbox = (min_lon, min_lat, max_lon, max_lat)
+    wakes = await get_kelvin_wakes(scene_id=scene_id, bbox=bbox, limit=limit)
+    return {"count": len(wakes), "wakes": wakes}

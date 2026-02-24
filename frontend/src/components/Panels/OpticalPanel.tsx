@@ -8,9 +8,8 @@ import {
   getTimelapseDownloadUrl,
 } from '../../hooks/useOptical'
 
-export default function OpticalPanel() {
+export default function OpticalPanel({ isOpen }: { isOpen: boolean }) {
   const opticalScenes = useVesselStore((s) => s.opticalScenes)
-  const [isOpen, setIsOpen] = useState(false)
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
   const [bboxStr, setBboxStr] = useState('')
@@ -85,17 +84,10 @@ export default function OpticalPanel() {
     }
   }
 
-  return (
-    <div className="absolute top-28 right-4 z-20">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="bg-navy-800/95 backdrop-blur border border-navy-600 rounded-lg px-3 py-2 text-sm font-medium text-green-400 hover:bg-navy-700/95 transition-colors"
-      >
-        Optical {isOpen ? '\u25B2' : '\u25BC'}
-      </button>
+  if (!isOpen) return null
 
-      {isOpen && (
-        <div className="mt-1 w-80 bg-navy-800/95 backdrop-blur border border-navy-600 rounded-lg overflow-hidden">
+  return (
+        <div className="w-80 bg-navy-800/95 backdrop-blur border border-navy-600 rounded-lg overflow-hidden">
           <div className="px-3 py-2 bg-green-900/20 border-b border-navy-600">
             <h3 className="text-green-400 font-semibold text-sm">Sentinel-2 Optical</h3>
           </div>
@@ -178,7 +170,5 @@ export default function OpticalPanel() {
             )}
           </div>
         </div>
-      )}
-    </div>
   )
 }

@@ -10,6 +10,7 @@ import logging
 from datetime import datetime, timezone
 
 from app.database import get_db
+from app.services.cmems_service import adjust_projection_for_current
 
 logger = logging.getLogger("poseidon.route_prediction")
 
@@ -144,6 +145,8 @@ async def predict_route(mmsi: int, hours: float = 24) -> dict:
             "hours_ahead": hours,
             "vessel_name": latest["name"],
             "ship_type": latest["ship_type"],
+            "destination_name": None,
+            "destination_coords": None,
         }
 
     # Get historical track for potential course adjustments
@@ -192,7 +195,18 @@ async def predict_route(mmsi: int, hours: float = 24) -> dict:
 
     for i in range(1, num_steps + 1):
         t = i * step_hours
-        new_lat, new_lon = _project_point(current_lat, current_lon, sog, cog, step_hours)
+
+        # Try current-adjusted projection first, fall back to dead reckoning
+        try:
+            adj_lat, adj_lon, adj_sog, adj_cog = adjust_projection_for_current(
+                current_lat, current_lon, sog, cog, step_hours,
+            )
+            if adj_lat != current_lat or adj_lon != current_lon:
+                new_lat, new_lon = adj_lat, adj_lon
+            else:
+                new_lat, new_lon = _project_point(current_lat, current_lon, sog, cog, step_hours)
+        except Exception:
+            new_lat, new_lon = _project_point(current_lat, current_lon, sog, cog, step_hours)
 
         # Uncertainty grows with sqrt of time
         uncertainty_nm = BASE_UNCERTAINTY_NM + UNCERTAINTY_GROWTH_NM * math.sqrt(t)
@@ -230,6 +244,8 @@ async def predict_route(mmsi: int, hours: float = 24) -> dict:
 
     # Check for ETA if destination known
     eta = None
+    destination_name = None
+    destination_coords = None
     if latest["destination"]:
         eta_row = await db.fetchrow(
             "SELECT eta FROM vessels WHERE mmsi = $1 AND eta IS NOT NULL",
@@ -237,6 +253,37 @@ async def predict_route(mmsi: int, hours: float = 24) -> dict:
         )
         if eta_row and eta_row["eta"]:
             eta = eta_row["eta"].isoformat()
+
+        # Look up destination port in ports table
+        dest_str = latest["destination"].strip().upper()
+        if dest_str:
+            port_row = await db.fetchrow(
+                """
+                SELECT name, locode, ST_X(geom) as lon, ST_Y(geom) as lat
+                FROM ports
+                WHERE UPPER(name) = $1 OR UPPER(locode) = $1
+                LIMIT 1
+                """,
+                dest_str,
+            )
+            if not port_row:
+                # Try partial match on name
+                port_row = await db.fetchrow(
+                    """
+                    SELECT name, locode, ST_X(geom) as lon, ST_Y(geom) as lat
+                    FROM ports
+                    WHERE UPPER(name) LIKE $1
+                    LIMIT 1
+                    """,
+                    f"%{dest_str}%",
+                )
+            if port_row:
+                destination_name = port_row["name"]
+                destination_coords = [float(port_row["lon"]), float(port_row["lat"])]
+                logger.info(
+                    "MMSI %d destination '%s' matched to port %s at [%.4f, %.4f]",
+                    mmsi, dest_str, destination_name, destination_coords[0], destination_coords[1],
+                )
 
     predicted_at = datetime.now(timezone.utc)
 
@@ -277,6 +324,8 @@ async def predict_route(mmsi: int, hours: float = 24) -> dict:
         "ship_type": latest["ship_type"],
         "sog_used": round(sog, 2),
         "cog_used": round(cog, 2),
+        "destination_name": destination_name,
+        "destination_coords": destination_coords,
     }
 
     logger.info(
