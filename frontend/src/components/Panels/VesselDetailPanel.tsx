@@ -1020,15 +1020,26 @@ export default function VesselDetailPanel() {
                         </div>
                       </div>
                     )}
-                    {equasis.cached_at && (
-                      <div className="text-[10px] text-gray-500">
-                        Cached: {new Date(equasis.cached_at).toLocaleString()}
-                      </div>
-                    )}
+                    <div className="flex items-center justify-between mt-1">
+                      {equasis.source && (
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded ${
+                          equasis.source === 'equasis'
+                            ? 'bg-violet-900/40 text-violet-400'
+                            : 'bg-navy-600 text-gray-400'
+                        }`}>
+                          {equasis.source === 'equasis' ? 'Equasis Registry' : 'AIS-Derived'}
+                        </span>
+                      )}
+                      {equasis.cached_at && (
+                        <span className="text-[10px] text-gray-500">
+                          {new Date(equasis.cached_at).toLocaleString()}
+                        </span>
+                      )}
+                    </div>
                   </>
                 )}
                 {equasis && !equasis.data && !equasisLoading && (
-                  <p className="text-xs text-gray-500">No Equasis data available (IMO required).</p>
+                  <p className="text-xs text-gray-500">No registry data available for this vessel.</p>
                 )}
                 {!equasis && !equasisLoading && (
                   <p className="text-xs text-gray-500">Click to look up vessel registry.</p>

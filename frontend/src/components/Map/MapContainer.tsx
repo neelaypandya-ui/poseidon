@@ -25,7 +25,7 @@ const INITIAL_VIEW: MapViewState = {
 const CARTO_DARK = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
 
 // GEBCO bathymetry WMS
-const GEBCO_WMS_URL = 'https://www.gebco.net/data_and_products/gebco_web_services/web_map_service/mapserv?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&LAYERS=GEBCO_LATEST_2&STYLES=&SRS=EPSG:3857&BBOX={bbox-epsg-3857}&WIDTH=256&HEIGHT=256&FORMAT=image/png&TRANSPARENT=true'
+const GEBCO_WMS_URL = 'https://wms.gebco.net/mapserv?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&LAYERS=GEBCO_LATEST_2&STYLES=&SRS=EPSG:3857&BBOX={bbox-epsg-3857}&WIDTH=256&HEIGHT=256&FORMAT=image/png&TRANSPARENT=true'
 
 export default function MapContainer() {
   const vessels = useVesselStore((s) => s.vessels)

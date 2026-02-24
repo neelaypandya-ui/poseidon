@@ -86,16 +86,16 @@ export default function ViirsPanel({ isOpen }: { isOpen: boolean }) {
                           {a.lat.toFixed(3)}, {a.lon.toFixed(3)}
                         </div>
                         <div className="text-xs text-gray-400">
-                          {a.anomaly_type || 'anomaly'}
-                          {a.brightness_ratio && ` \u00B7 ${a.brightness_ratio.toFixed(1)}x baseline`}
+                          {a.anomaly_type || 'hotspot'}
+                          {a.anomaly_ratio != null && ` \u00B7 ${a.anomaly_ratio.toFixed(1)}x baseline`}
                         </div>
                       </div>
                       <div className="text-xs text-orange-400 font-mono">
-                        {a.bright_ti4.toFixed(0)}K
+                        {a.radiance.toFixed(1)} nW
                       </div>
                     </div>
                     <div className="text-xs text-gray-500 mt-0.5">
-                      {new Date(a.detected_at).toLocaleString()}
+                      {a.observation_date}
                     </div>
                   </div>
                 ))}

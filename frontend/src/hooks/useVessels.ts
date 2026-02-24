@@ -26,6 +26,24 @@ async function fetchAcousticEvents() {
   }
 }
 
+async function fetchSarDetectionsAuto() {
+  try {
+    const { data } = await axios.get(`${API_URL}/api/v1/sar/detections`)
+    return data.detections || []
+  } catch {
+    return []
+  }
+}
+
+async function fetchViirsAnomaliesAuto() {
+  try {
+    const { data } = await axios.get(`${API_URL}/api/v1/viirs/anomalies`)
+    return data.anomalies || []
+  } catch {
+    return []
+  }
+}
+
 export function useVessels() {
   const setVessels = useVesselStore((s) => s.setVessels)
   const setDarkAlerts = useVesselStore((s) => s.setDarkAlerts)
@@ -33,6 +51,8 @@ export function useVessels() {
   const setSpoofClusters = useVesselStore((s) => s.setSpoofClusters)
   const setCorrelationCount = useVesselStore((s) => s.setCorrelationCount)
   const setAcousticEvents = useVesselStore((s) => s.setAcousticEvents)
+  const setSarDetections = useVesselStore((s) => s.setSarDetections)
+  const setViirsAnomalies = useVesselStore((s) => s.setViirsAnomalies)
 
   const vesselsQuery = useQuery({
     queryKey: ['vessels'],
@@ -70,6 +90,18 @@ export function useVessels() {
     refetchInterval: 120000,
   })
 
+  const sarDetectionsQuery = useQuery({
+    queryKey: ['sarDetections'],
+    queryFn: fetchSarDetectionsAuto,
+    refetchInterval: 120000,
+  })
+
+  const viirsAnomaliesQuery = useQuery({
+    queryKey: ['viirsAnomalies'],
+    queryFn: fetchViirsAnomaliesAuto,
+    refetchInterval: 120000,
+  })
+
   useEffect(() => {
     if (vesselsQuery.data) {
       setVessels(vesselsQuery.data)
@@ -99,6 +131,18 @@ export function useVessels() {
       setCorrelationCount(correlationQuery.data.correlated_pairs)
     }
   }, [correlationQuery.data, setCorrelationCount])
+
+  useEffect(() => {
+    if (sarDetectionsQuery.data) {
+      setSarDetections(sarDetectionsQuery.data)
+    }
+  }, [sarDetectionsQuery.data, setSarDetections])
+
+  useEffect(() => {
+    if (viirsAnomaliesQuery.data) {
+      setViirsAnomalies(viirsAnomaliesQuery.data)
+    }
+  }, [viirsAnomaliesQuery.data, setViirsAnomalies])
 
   useEffect(() => {
     if (acousticQuery.data) {

@@ -216,20 +216,26 @@ async def _cluster_signals():
             window_start = cluster_signals[0]["detected_at"]
             window_end = cluster_signals[-1]["detected_at"]
 
-            # Create cluster with centroid computed by PostGIS
+            # Create cluster with centroid and radius computed by PostGIS
             cluster_id = await conn.fetchval(
                 """
+                WITH pts AS (
+                    SELECT ST_Collect(geom) AS collected,
+                           ST_Centroid(ST_Collect(geom)) AS centroid
+                    FROM spoof_signals WHERE id = ANY($5)
+                )
                 INSERT INTO spoof_clusters (signal_count, centroid, radius_nm,
                                             window_start, window_end, anomaly_types)
                 SELECT
                     $1,
-                    ST_Centroid(ST_Collect(geom)),
+                    pts.centroid,
                     COALESCE(
-                        MAX(ST_Distance(geom::geography, ST_Centroid(ST_Collect(geom) OVER ())::geography)) / 1852.0,
+                        (SELECT MAX(ST_Distance(s.geom::geography, pts.centroid::geography)) / 1852.0
+                         FROM spoof_signals s WHERE s.id = ANY($5)),
                         0
                     ),
                     $2, $3, $4::text[]
-                FROM spoof_signals WHERE id = ANY($5)
+                FROM pts
                 RETURNING id
                 """,
                 len(signal_ids),
@@ -238,28 +244,6 @@ async def _cluster_signals():
                 anomaly_types,
                 signal_ids,
             )
-
-            if cluster_id is None:
-                # Fallback: simpler insert without inline window function
-                cluster_id = await conn.fetchval(
-                    """
-                    WITH pts AS (
-                        SELECT ST_Collect(geom) AS collected,
-                               ST_Centroid(ST_Collect(geom)) AS centroid
-                        FROM spoof_signals WHERE id = ANY($5)
-                    )
-                    INSERT INTO spoof_clusters (signal_count, centroid, radius_nm,
-                                                window_start, window_end, anomaly_types)
-                    SELECT $1, pts.centroid, 0, $2, $3, $4::text[]
-                    FROM pts
-                    RETURNING id
-                    """,
-                    len(signal_ids),
-                    window_start,
-                    window_end,
-                    anomaly_types,
-                    signal_ids,
-                )
 
             if cluster_id:
                 await conn.execute(

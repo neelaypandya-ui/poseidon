@@ -107,13 +107,11 @@ export interface ViirsAnomaly {
   id: number
   lon: number
   lat: number
-  bright_ti4: number
-  bright_ti5: number | null
-  frp: number | null
-  confidence: string | null
+  radiance: number
+  baseline_radiance: number | null
+  anomaly_ratio: number | null
   anomaly_type: string | null
-  brightness_ratio: number | null
-  detected_at: string
+  observation_date: string
 }
 
 export interface ForensicPing {
@@ -344,10 +342,10 @@ export const useVesselStore = create<VesselState>((set) => ({
   portsLayerVisible: false,
   portsData: null,
 
-  bathymetryLayerVisible: false,
+  bathymetryLayerVisible: true,
 
   acousticEvents: [],
-  acousticLayerVisible: false,
+  acousticLayerVisible: true,
 
   webcamLayerVisible: false,
 

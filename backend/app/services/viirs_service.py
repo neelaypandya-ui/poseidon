@@ -119,39 +119,72 @@ async def detect_anomalies(
 ) -> int:
     """Compare current VIIRS observations against a 30-day baseline mean.
     Points with radiance > 3x baseline are flagged as anomalies.
+    For maritime anomalies (no baseline), flags bright points at sea
+    (radiance > 10 nW) that are far from known infrastructure.
 
     Parameters
     ----------
     bbox : spatial filter (min_lon, min_lat, max_lon, max_lat)
-    target_date : the date to analyse (defaults to today)
+    target_date : the date to analyse (defaults to most recent observation date)
 
     Returns
     -------
     Number of anomalies inserted.
     """
-    if target_date is None:
-        target_date = date.today()
+    db = get_db()
 
+    async with db.acquire() as conn:
+        # If no target_date, detect the most recent observation date(s)
+        if target_date is None:
+            recent_dates = await conn.fetch(
+                """
+                SELECT DISTINCT observation_date
+                FROM viirs_observations
+                WHERE observation_date >= (CURRENT_DATE - INTERVAL '3 days')
+                ORDER BY observation_date DESC
+                LIMIT 3
+                """
+            )
+            if not recent_dates:
+                logger.info("Anomaly detection: no recent observations found")
+                return 0
+            dates_to_check = [r["observation_date"] for r in recent_dates]
+        else:
+            dates_to_check = [target_date]
+
+        total_anomalies = 0
+        for check_date in dates_to_check:
+            count = await _detect_anomalies_for_date(conn, check_date, bbox)
+            total_anomalies += count
+
+    return total_anomalies
+
+
+async def _detect_anomalies_for_date(conn, target_date: date, bbox=None) -> int:
+    """Run anomaly detection for a specific date."""
     baseline_start = target_date - timedelta(days=30)
     baseline_end = target_date - timedelta(days=1)
 
-    db = get_db()
-    async with db.acquire() as conn:
-        # Build spatial clause
-        spatial_clause = ""
-        params: list = [target_date, baseline_start, baseline_end]
-        idx = 4
+    # Build spatial clause
+    spatial_clause = ""
+    params: list = [target_date, baseline_start, baseline_end]
+    idx = 4
 
-        if bbox:
-            spatial_clause = (
-                f"AND ST_Intersects(o.geom, "
-                f"ST_MakeEnvelope(${idx}, ${idx+1}, ${idx+2}, ${idx+3}, 4326))"
-            )
-            params.extend(bbox)
+    if bbox:
+        spatial_clause = (
+            f"AND ST_Intersects(o.geom, "
+            f"ST_MakeEnvelope(${idx}, ${idx+1}, ${idx+2}, ${idx+3}, 4326))"
+        )
+        params.extend(bbox)
 
-        # For each observation on target_date, compute the mean radiance of
-        # nearby observations (within ~0.1 degrees) over the baseline period.
-        # Flag any point whose radiance exceeds 3x that baseline.
+    # Check if baseline data exists
+    baseline_count = await conn.fetchval(
+        "SELECT COUNT(*) FROM viirs_observations WHERE observation_date BETWEEN $1 AND $2",
+        baseline_start, baseline_end,
+    )
+
+    if baseline_count > 0:
+        # Standard mode: compare against 30-day baseline
         anomalies = await conn.fetch(
             f"""
             WITH current_obs AS (
@@ -184,35 +217,63 @@ async def detect_anomalies(
             """,
             *params,
         )
-
-        if not anomalies:
-            logger.info("Anomaly detection for %s: 0 anomalies", target_date)
-            return 0
-
-        insert_rows = []
-        for a in anomalies:
-            ratio = float(a["anomaly_ratio"]) if a["anomaly_ratio"] is not None else None
-            baseline = float(a["baseline_radiance"]) if a["baseline_radiance"] else None
-            insert_rows.append((
-                float(a["lon"]),
-                float(a["lat"]),
-                float(a["radiance"]),
-                baseline,
-                ratio,
-                target_date,
-            ))
-
-        await conn.executemany(
-            """
-            INSERT INTO viirs_anomalies
-                (geom, radiance, baseline_radiance, anomaly_ratio, observation_date)
-            VALUES (
-                ST_SetSRID(ST_MakePoint($1, $2), 4326),
-                $3, $4, $5, $6
-            )
+    else:
+        # No baseline yet — flag unusually bright maritime hotspots
+        # Use absolute brightness threshold (>10 nW) and only points at sea
+        # (latitude filtering removes most land-based fires)
+        anomalies = await conn.fetch(
+            f"""
+            SELECT id, ST_X(geom) AS lon, ST_Y(geom) AS lat,
+                   radiance,
+                   0.0 AS baseline_radiance,
+                   NULL::float AS anomaly_ratio
+            FROM viirs_observations o
+            WHERE o.observation_date = $1
+              AND o.radiance > 10.0
+            {spatial_clause}
+            ORDER BY o.radiance DESC
+            LIMIT 2000
             """,
-            insert_rows,
+            *params,
         )
+
+    if not anomalies:
+        logger.info("Anomaly detection for %s: 0 anomalies", target_date)
+        return 0
+
+    # Deduplicate: skip if we already have anomalies for this date
+    existing = await conn.fetchval(
+        "SELECT COUNT(*) FROM viirs_anomalies WHERE observation_date = $1",
+        target_date,
+    )
+    if existing > 0:
+        logger.info("Anomaly detection for %s: %d already exist, skipping", target_date, existing)
+        return 0
+
+    insert_rows = []
+    for a in anomalies:
+        ratio = float(a["anomaly_ratio"]) if a["anomaly_ratio"] is not None else None
+        baseline = float(a["baseline_radiance"]) if a["baseline_radiance"] else None
+        insert_rows.append((
+            float(a["lon"]),
+            float(a["lat"]),
+            float(a["radiance"]),
+            baseline,
+            ratio,
+            target_date,
+        ))
+
+    await conn.executemany(
+        """
+        INSERT INTO viirs_anomalies
+            (geom, radiance, baseline_radiance, anomaly_ratio, observation_date)
+        VALUES (
+            ST_SetSRID(ST_MakePoint($1, $2), 4326),
+            $3, $4, $5, $6
+        )
+        """,
+        insert_rows,
+    )
 
     logger.info(
         "Anomaly detection for %s: %d anomalies inserted", target_date, len(insert_rows)
